@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  zookeeper:
+    image: "bitnami/zookeeper:latest"
+    restart: unless-stopped
+    ports:
+      - 2181:2181
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - kafka-network
+    volumes:
+      - ./data/zookeeper:/bitnami/zookeeper
+  kafka_1:
+    image: "bitnami/kafka:latest"
+    restart: unless-stopped
+    ports:
+      - 9092:9092
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - kafka-network
+    volumes:
+      - ./data/kafka_1:/bitnami/kafka
+    depends_on:
+      - zookeeper
+
+  kafka_2:
+    image: "bitnami/kafka:latest"
+    restart: unless-stopped
+    ports:
+      - 9093:9092
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - kafka-network
+    volumes:
+      - ./data/kafka_2:/bitnami/kafka
+    depends_on:
+      - zookeeper
+
+networks:
+  kafka-network:
+    driver: bridge
